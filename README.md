@@ -1,4 +1,8 @@
-# Software Developer Challenge
+# What is the Vine Go?
+The project for my solution of the software challenge. This application will provide the searching function for alcohols. 
+
+
+# The challenges from Paytm Labs
 
 ## Challenge 1: 
 Read through the rest of the assignment, decide which technologies to use and explain why you chose what you chose. As a reminder we at Paytm are dealing with millions of concurrent users, just sayin’ :)
