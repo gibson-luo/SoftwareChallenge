@@ -11,8 +11,10 @@ libraryDependencies ++= Seq(
   guice,
   ws,
   "io.lettuce" % "lettuce-core" % "5.0.5.RELEASE",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.6",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.9.6",
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.6"
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.6",
+  "com.netflix.governator" % "governator" % "1.17.5" % "runtime"
 
 )
 

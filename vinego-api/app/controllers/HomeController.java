@@ -1,11 +1,12 @@
 package controllers;
 
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import play.libs.ws.WSBodyReadables;
@@ -14,6 +15,7 @@ import play.libs.ws.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Result;
 import tools.JsonTool;
+import tools.RedisTool;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -24,8 +26,10 @@ public class HomeController extends Controller implements WSBodyReadables {
     @Inject
     WSClient ws;
 
-    private static String ACCESS_KEY
-        = "MDplOTU2YjM3NC1hYzYwLTExZTgtYTQ0ZS0zYjZlMjk2ZTI4YzY6NEl2WTVsem00R0E1SDNwSnBjTUhjaW03anFRZjJwSGFYTTBh";
+    @Inject
+    Config config;
+
+    private final String DEFAULT_PER_PAGE = "10";
 
     /**
      * An action that renders an HTML page with a welcome message.
@@ -43,30 +47,30 @@ public class HomeController extends Controller implements WSBodyReadables {
      * @return
      */
     public CompletionStage<Result> products() {
+        final String ACCESS_KEY = config.getString("LCBOAPI_ACCESS_KEY");
+        final String REDIS_URL = config.getString("REDIS_URL");
 
-        RedisClient redisClient = RedisClient.create("redis://localhost:6379/0");
+        String query = request().getQueryString("query");
+        String page = request().getQueryString("page");
+
+        RedisClient redisClient = RedisClient.create(REDIS_URL);
         StatefulRedisConnection<String, String> connection = redisClient.connect();
         RedisAsyncCommands<String, String> commands = connection.async();
 
         WSRequest request = ws.url("http://lcboapi.com/products");
         request.addQueryParameter("access_key", ACCESS_KEY)
-            .addQueryParameter("page", "1")
-            .addQueryParameter("per_page", "10");
+            .addQueryParameter("q", Optional.ofNullable(query).orElse(""))
+            .addQueryParameter("page", Optional.ofNullable(page).orElse("1"))
+            .addQueryParameter("per_page", DEFAULT_PER_PAGE);
 
-        StringBuffer sb = new StringBuffer(request.getUrl());
-        sb.append("?");
+        String key = RedisTool.convertUrl2Key(request);
 
-        request.getQueryParameters().entrySet().stream().forEach(entry -> {
-            sb.append(entry.getKey());
-            sb.append("=");
-            sb.append(entry.getValue().get(0));
-            sb.append("&");
-        });
-
-        final String key = sb.toString();
-
-        RedisFuture<Long> existsFuture = commands.exists(key);
-        return existsFuture.thenCompose(exists -> {
+        /**
+         * 1. check the cache
+         * 2. if it has the key then return the value of cache
+         * 3. else request the LCBO api to get the result, and put the result to cache
+         */
+        return commands.exists(key).thenCompose(exists -> {
             if (exists == 1) {
                 return commands.get(key).thenApply(value -> ok(JsonTool.toJsonNode(value)));
             } else {
