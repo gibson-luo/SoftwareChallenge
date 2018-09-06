@@ -5,10 +5,9 @@ import java.util.concurrent.CompletionStage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
-import com.typesafe.config.Config;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
+import com.google.inject.name.Named;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
 import play.libs.ws.WSBodyReadables;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
@@ -21,15 +20,30 @@ import tools.RedisTool;
  * This controller contains an action to handle HTTP requests
  * to the application's home page.
  */
-public class HomeController extends Controller implements WSBodyReadables {
+public class ApplicationController extends Controller implements WSBodyReadables {
+
+    private final String accessKey;
+
+    private final int defaultPerPage;
+
+    private final String lcboRk;
+
+    private final WSClient ws;
+
+    private final RedissonClient redissonClient;
 
     @Inject
-    WSClient ws;
-
-    @Inject
-    Config config;
-
-    private final String DEFAULT_PER_PAGE = "10";
+    public ApplicationController(@Named("lcboapi.accessKey") String accessKey,
+                                 @Named("lcboapi.defaultPerPage") int defaultPerPage,
+                                 @Named("redis.key.lcboapi") String lcboRk,
+                                 WSClient ws,
+                                 RedissonClient redissonClient) {
+        this.accessKey = accessKey;
+        this.defaultPerPage = defaultPerPage;
+        this.lcboRk = lcboRk;
+        this.ws = ws;
+        this.redissonClient = redissonClient;
+    }
 
     /**
      * An action that renders an HTML page with a welcome message.
@@ -47,37 +61,30 @@ public class HomeController extends Controller implements WSBodyReadables {
      * @return
      */
     public CompletionStage<Result> products() {
-        final String ACCESS_KEY = config.getString("LCBOAPI_ACCESS_KEY");
-        final String REDIS_URL = config.getString("REDIS_URL");
-
         String query = request().getQueryString("query");
         String page = request().getQueryString("page");
 
-        RedisClient redisClient = RedisClient.create(REDIS_URL);
-        StatefulRedisConnection<String, String> connection = redisClient.connect();
-        RedisAsyncCommands<String, String> commands = connection.async();
-
         WSRequest request = ws.url("http://lcboapi.com/products");
-        request.addQueryParameter("access_key", ACCESS_KEY)
+        request.addQueryParameter("access_key", accessKey)
             .addQueryParameter("q", Optional.ofNullable(query).orElse(""))
             .addQueryParameter("page", Optional.ofNullable(page).orElse("1"))
-            .addQueryParameter("per_page", DEFAULT_PER_PAGE);
-
-        String key = RedisTool.convertUrl2Key(request);
+            .addQueryParameter("per_page", String.valueOf(defaultPerPage));
 
         /**
          * 1. check the cache
          * 2. if it has the key then return the value of cache
          * 3. else request the LCBO api to get the result, and put the result to cache
          */
-        return commands.exists(key).thenCompose(exists -> {
-            if (exists == 1) {
-                return commands.get(key).thenApply(value -> ok(JsonTool.toJsonNode(value)));
+        String key = RedisTool.convertUrl2Key(request);
+        RMap<String, String> rMap = redissonClient.getMap(lcboRk);
+        return rMap.containsKeyAsync(key).thenCompose(exists -> {
+            if (exists) {
+                return rMap.getAsync(key).thenApply(value -> ok(JsonTool.toJsonNode(value)));
             } else {
                 return request.get()
                     .thenApply(response -> {
                             JsonNode json = response.asJson();
-                            commands.set(key, json.toString());
+                            rMap.putAsync(key, json.toString());
                             return ok(json);
                         }
                     );
