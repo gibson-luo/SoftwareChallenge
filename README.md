@@ -1,5 +1,5 @@
 
-# What is the Vine Go?
+# Vine Go
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e881c7ec3d8a413aa2e0cb9b90d03dde)](https://app.codacy.com/app/gibson-luo/VineGo?utm_source=github.com&utm_medium=referral&utm_content=gibson-luo/VineGo&utm_campaign=Badge_Grade_Dashboard)
 
