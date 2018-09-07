@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/events/github/e881c7ec3d8a413aa2e0cb9b90d03dde)](https://app.codacy.com/project/gibson-luo/VineGo/dashboard)
 # What is the Vine Go?
 The project for my solution of the software challenge. This application will provide the searching function for alcohols. 
 
