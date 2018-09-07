@@ -30,6 +30,12 @@ public class BaseDataWrapper<T> implements Serializable {
 
     private static final long serialVersionUID = -7661471414132455170L;
 
+    private int code;
+
+    private String msg;
+
+    private T data;
+
     public BaseDataWrapper() {
 
     }
@@ -49,8 +55,6 @@ public class BaseDataWrapper<T> implements Serializable {
         this.msg = status.getMsg();
     }
 
-    private int code;
-
     public int getCode() {
         return code;
     }
@@ -59,8 +63,6 @@ public class BaseDataWrapper<T> implements Serializable {
         this.code = code;
     }
 
-    private String msg;
-
     public String getMsg() {
         return msg;
     }
@@ -68,8 +70,6 @@ public class BaseDataWrapper<T> implements Serializable {
     public void setMsg(String msg) {
         this.msg = msg;
     }
-
-    private T data;
 
     public T getData() {
         return data;

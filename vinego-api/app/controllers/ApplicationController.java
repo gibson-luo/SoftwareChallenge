@@ -56,7 +56,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
     }
 
     /**
-     * try to get the product list from LCBO API
+     * get the product list from LCBO API
      *
      * @return
      */
