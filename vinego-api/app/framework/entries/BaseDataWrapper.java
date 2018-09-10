@@ -1,4 +1,4 @@
-package entries;
+package framework.entries;
 
 import java.io.Serializable;
 

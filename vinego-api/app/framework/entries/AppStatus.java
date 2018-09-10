@@ -1,4 +1,4 @@
-package entries;
+package framework.entries;
 
 /**
  * This enum defines all the application's status code and msg.

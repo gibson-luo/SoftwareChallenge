@@ -1,7 +1,7 @@
 package tools;
 
-import entries.AppStatus;
-import entries.BaseDataWrapper;
+import framework.entries.AppStatus;
+import framework.entries.BaseDataWrapper;
 
 /**
  * This is a tool for creating the Data Wrapper
