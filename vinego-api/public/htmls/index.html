@@ -24,9 +24,9 @@
             <div class="col input-group mb-3  input-group-lg">
                 <input id="query" type="text" class="form-control" placeholder="Vine's name or keyword"
                        aria-label="Vine's name or keyword" aria-describedby="inputGroup-sizing-lg"
-                       aria-describedby="button-go" v-model="query" @keyup.enter="loadItems">
+                       aria-describedby="button-go" v-model="query" @keyup.enter="search">
                 <div class="input-group-append">
-                    <button class="btn btn btn-success" type="button" id="button-go" @click="loadItems">GO</button>
+                    <button class="btn btn btn-success" type="button" id="button-go" @click="search">GO</button>
                 </div>
             </div>
         </div>
@@ -54,8 +54,22 @@
         <div class="col-md-3"></div>
     </div>
 
+    <div class="row">
+        <div class="col-lg-5"></div>
+        <div class="col-lg-2 text-center">
+            <a class="navbar-brand row mb-3" href="#" v-show="isShow">Back To Top</a>
+        </div>
+        <div class="col-lg-5"></div>
+    </div>
 
 </div>
+
+
+<script type="text/x-template" id="backtotop">
+    <button class="goTop" v-if="isVisible" @click="backToTop">
+        <i class="fa fa-angle-up" aria-hidden="true"></i>
+    </button>
+</script>
 
 </body>
 <!-- Optional JavaScript -->
