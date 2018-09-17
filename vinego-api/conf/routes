@@ -9,6 +9,12 @@
 
 # A quick example for getting data from LCBO api
 GET     /products                   controllers.ApplicationController.products
+GET     /lucky                      controllers.ApplicationController.lucky
+
+# authorization
+POST    /register                   controllers.AuthorizationController.register
+POST    /login                      controllers.AuthorizationController.login
+GET     /logout                     controllers.AuthorizationController.logout
 
 # Map static resources from the /public folder to the /assets URL path
 

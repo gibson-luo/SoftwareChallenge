@@ -6,6 +6,9 @@ import java.util.concurrent.CompletionStage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import framework.cache.RedisTool;
+import framework.entries.JsonTool;
+import framework.security.JwtSecurityAction;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import play.libs.ws.WSBodyReadables;
@@ -13,13 +16,13 @@ import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Result;
-import tools.JsonTool;
-import tools.RedisTool;
+import play.mvc.With;
 
 /**
  * This controller contains an action to handle HTTP requests
  * to the application's home page.
  */
+@With(JwtSecurityAction.class)
 public class ApplicationController extends Controller implements WSBodyReadables {
 
     private final String accessKey;
@@ -46,17 +49,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
     }
 
     /**
-     * An action that renders an HTML page with a welcome message.
-     * The configuration in the <code>routes</code> file means that
-     * this method will be called when the application receives a
-     * <code>GET</code> request with a path of <code>/</code>.
-     */
-    public Result index() {
-        return ok(views.html.index.render());
-    }
-
-    /**
-     * get the product list from LCBO API
+     * search the product list from LCBO API
      *
      * @return
      */
@@ -77,7 +70,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
          */
         String key = RedisTool.convertUrl2Key(request);
         RMap<String, String> rMap = redissonClient.getMap(lcboRk);
-        return rMap.containsKeyAsync(key).thenCompose(exists -> {
+        return redissonClient.getMap(lcboRk).containsKeyAsync(key).thenCompose(exists -> {
             if (exists) {
                 return rMap.getAsync(key).thenApply(value -> ok(JsonTool.toJsonNode(value)));
             } else {
@@ -90,7 +83,10 @@ public class ApplicationController extends Controller implements WSBodyReadables
                     );
             }
         });
+    }
 
+    public CompletionStage<Result> lucky() {
+        return null;
     }
 
 }

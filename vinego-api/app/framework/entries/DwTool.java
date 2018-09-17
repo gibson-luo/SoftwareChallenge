@@ -1,4 +1,4 @@
-package tools;
+package framework.entries;
 
 import framework.entries.AppStatus;
 import framework.entries.BaseDataWrapper;
