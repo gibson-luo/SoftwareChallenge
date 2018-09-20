@@ -86,7 +86,11 @@ public class ApplicationController extends Controller implements WSBodyReadables
     }
 
     public CompletionStage<Result> lucky() {
+
+
+
         return null;
     }
+
 
 }

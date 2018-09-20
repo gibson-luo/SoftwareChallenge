@@ -11,6 +11,10 @@ public class JwtEntry {
         this.token = token;
     }
 
+    public JwtEntry(String token){
+        this.token = token;
+    }
+
     private String issuer;
 
     private String token;

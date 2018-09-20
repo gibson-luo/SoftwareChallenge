@@ -1,16 +1,18 @@
 package framework.security;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 import play.mvc.Http.Context;
-import play.mvc.Http.Request;
 import play.mvc.Result;
 
 /**
+ * This action verify the JWT access tokens
+ * The verification steps are below:
+ * 1. Extract token from the header and check that the JWT is well formed
+ * 2. Verify the signature
+ * 3. Check the Application permissions
  *
  * Created by gibson.luo on 2018-09-15.
  */
@@ -19,15 +21,16 @@ public class JwtSecurityAction extends play.mvc.Action.Simple {
     @Override
     public CompletionStage<Result> call(Context ctx) {
         Logger.info("Calling action: {}", this.getClass().getName());
-        Request request = ctx.request();
-        String issuer = request.getQueryString("issuer");
-        if (StringUtils.isBlank(issuer)) { return CompletableFuture.supplyAsync(() -> forbidden()); }
+        try {
+            JwtTool.verifier()
+                .getToken(ctx.request())
+                .verify()
+                .checkPermission();
 
-        long issuedAt = Long.valueOf(Optional.of(request.getQueryString("issuedAt")).orElse("0"));
-        String token = "";
-        if(!JwtTool.verify(token, issuer, issuedAt)){
+        } catch (Throwable t) {
             return CompletableFuture.supplyAsync(() -> forbidden());
         }
         return delegate.call(ctx);
     }
+
 }
