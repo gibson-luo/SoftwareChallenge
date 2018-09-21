@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,12 +12,14 @@ import framework.entries.JsonTool;
 import framework.security.JwtSecurityAction;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import play.Logger;
 import play.libs.ws.WSBodyReadables;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import services.UserMapper;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -35,17 +38,21 @@ public class ApplicationController extends Controller implements WSBodyReadables
 
     private final RedissonClient redissonClient;
 
+    private UserMapper userService;
+
     @Inject
     public ApplicationController(@Named("lcboapi.accessKey") String accessKey,
                                  @Named("lcboapi.defaultPerPage") int defaultPerPage,
                                  @Named("redis.key.lcboapi") String lcboRk,
                                  WSClient ws,
-                                 RedissonClient redissonClient) {
+                                 RedissonClient redissonClient,
+                                 UserMapper userMapper) {
         this.accessKey = accessKey;
         this.defaultPerPage = defaultPerPage;
         this.lcboRk = lcboRk;
         this.ws = ws;
         this.redissonClient = redissonClient;
+        this.userService = userMapper;
     }
 
     /**
@@ -87,10 +94,13 @@ public class ApplicationController extends Controller implements WSBodyReadables
 
     public CompletionStage<Result> lucky() {
 
+        StringBuffer allUser = new StringBuffer("all the users: ");
+        userService.all().forEach(item -> {
+            allUser.append(item.getUsername());
+            allUser.append("  ");
+        });
 
-
-        return null;
+        return CompletableFuture.supplyAsync(() -> ok(allUser.toString()));
     }
-
 
 }

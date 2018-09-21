@@ -1,0 +1,24 @@
+package model;
+
+/**
+ * Created by gibson.luo on 2018-09-21.
+ */
+public class User {
+
+    private Long id;
+
+    private String username;
+
+    public User(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}
