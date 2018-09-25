@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import framework.cache.RedisTool;
-import framework.entries.JsonTool;
+import framework.entries.Json;
+import framework.entries.Resp;
 import framework.security.JwtSecurityAction;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import play.Logger;
 import play.libs.ws.WSBodyReadables;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
@@ -25,7 +25,6 @@ import services.UserMapper;
  * This controller contains an action to handle HTTP requests
  * to the application's home page.
  */
-@With(JwtSecurityAction.class)
 public class ApplicationController extends Controller implements WSBodyReadables {
 
     private final String accessKey;
@@ -38,7 +37,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
 
     private final RedissonClient redissonClient;
 
-    private UserMapper userService;
+    private final UserMapper userService;
 
     @Inject
     public ApplicationController(@Named("lcboapi.accessKey") String accessKey,
@@ -60,6 +59,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
      *
      * @return
      */
+    @With(JwtSecurityAction.class)
     public CompletionStage<Result> products() {
         String query = request().getQueryString("query");
         String page = request().getQueryString("page");
@@ -79,7 +79,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
         RMap<String, String> rMap = redissonClient.getMap(lcboRk);
         return redissonClient.getMap(lcboRk).containsKeyAsync(key).thenCompose(exists -> {
             if (exists) {
-                return rMap.getAsync(key).thenApply(value -> ok(JsonTool.toJsonNode(value)));
+                return rMap.getAsync(key).thenApply(value -> ok(Json.toJsonNode(value)));
             } else {
                 return request.get()
                     .thenApply(response -> {
@@ -92,6 +92,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
         });
     }
 
+    @With(JwtSecurityAction.class)
     public CompletionStage<Result> lucky() {
 
         StringBuffer allUser = new StringBuffer("all the users: ");
@@ -103,4 +104,7 @@ public class ApplicationController extends Controller implements WSBodyReadables
         return CompletableFuture.supplyAsync(() -> ok(allUser.toString()));
     }
 
+    public Result nowTime() {
+        return Resp.ok(System.currentTimeMillis() / 1000);
+    }
 }

@@ -17,4 +17,23 @@
     <select id="getUserById" parameterType="Long" resultMap="userMap">
         SELECT * FROM T_USER WHERE id = #{value}
     </select>
+
+    <select id="isExistUser" parameterType="String" resultType="boolean">
+        SELECT count(*)
+        FROM T_USER
+        WHERE username = #{username,jdbcType=VARCHAR}
+        and status = 1
+    </select>
+
+    <insert id="add" parameterType="model.User">
+    insert into t_user (
+     `username`,
+     `password`
+    )
+    values (
+     #{username,jdbcType=VARCHAR},
+     #{password,jdbcType=VARCHAR}
+ )
+  </insert>
+
 </mapper>

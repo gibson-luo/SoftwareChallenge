@@ -40,7 +40,7 @@ public class BaseDataWrapper<T> implements Serializable {
 
     }
 
-    public BaseDataWrapper(AppStatus status, T data) {
+    public BaseDataWrapper(Status status, T data) {
         this.code = status.getCode();
         this.data = data;
     }
@@ -50,7 +50,7 @@ public class BaseDataWrapper<T> implements Serializable {
         this.msg = msg;
     }
 
-    public BaseDataWrapper(AppStatus status) {
+    public BaseDataWrapper(Status status) {
         this.code = status.getCode();
         this.msg = status.getMsg();
     }
@@ -85,11 +85,11 @@ public class BaseDataWrapper<T> implements Serializable {
      * @return
      */
     public boolean hasCode() {
-        return this.code != AppStatus._UNDEFINED_CODE;
+        return this.code != Status._UNDEFINED_CODE;
     }
 
     public boolean withSuccedCode() {
-        return this.code == AppStatus._SUCCEED_CODE;
+        return this.code == Status._SUCCEED_CODE;
     }
 
 }

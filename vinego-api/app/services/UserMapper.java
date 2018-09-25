@@ -11,6 +11,13 @@ public interface UserMapper {
 
     List<User> all();
 
+    boolean add(User user);
+
+    boolean isExistUser(String username);
+
+    User getUserByUsername(String username);
+
     User getUserById(Long id);
+
 
 }

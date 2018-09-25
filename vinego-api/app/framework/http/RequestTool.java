@@ -1,12 +1,14 @@
 package framework.http;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.lang.Assert;
-import play.Logger;
 import play.mvc.Http;
 
 /**
@@ -29,20 +31,25 @@ public class RequestTool {
     public static Map<String, String> allParamMap(Http.Request request) {
         Assert.notNull(request, "request cannot be null");
 
-        Map<String, String[]> urlParams = Optional.of(request.queryString()).or(Maps.newHashMap());
-        Map<String, String[]> bodyParams = request.body().asFormUrlEncoded();
-        Map<String, String> allParamMap = Maps.newHashMap();
+        Map<String, String[]> urlParams = request.queryString();
+        Map<String, String[]> bodyParams = Optional.of(request.body().asFormUrlEncoded()).or(Maps.newHashMap());
+        Map<String, String> map = Maps.newHashMap();
 
-        Stream.of(urlParams, Optional.of(bodyParams).or(Maps.newHashMap()))
-            .flatMap(map -> map.entrySet().stream())
-            .filter(entry -> entry.getKey() == null || entry.getValue() == null)
-            .forEach(entry -> {
-                String value = entry.getValue()[0];
-                if (entry.getValue()[0] != null && !allParamMap.containsKey(entry.getKey())) {
-                    allParamMap.put(entry.getKey(), value);
-                }
-            });
-        return allParamMap;
+        Map<String, String[]> mergeMap = Stream.of(urlParams, bodyParams)
+            .map(Map::entrySet)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        for (Entry<String, String[]> item : mergeMap.entrySet()) {
+            String key = item.getKey();
+            String[] valueArray = item.getValue();
+            if (valueArray.length > 0) {
+                String value = valueArray[0];
+                map.put(key, value);
+            }
+        }
+
+        return map;
     }
 
 }

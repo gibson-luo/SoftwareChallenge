@@ -14,7 +14,7 @@ import play.Logger;
  *
  * Created by gibson.luo on 2018-09-03.
  */
-public class JsonTool {
+public class Json {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

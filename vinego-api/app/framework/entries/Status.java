@@ -5,12 +5,17 @@ package framework.entries;
  *
  * Created by gibson.luo on 2018-09-05.
  */
-public enum AppStatus {
+public enum Status {
 
     OK(200, null),
 
     INTERNAL_SERVER_ERROR(500, "internal server error"),
-    UNDEFINED_CODE(501, "undefined status code");
+    UNDEFINED_CODE(501, "undefined status code"),
+
+    USERNAME_REQUIRED(1001,"username required"),
+    PASSWORD_REQUIRED(1002,"password required"),
+
+        ;
 
     static final int _SUCCEED_CODE = 200;
     static final int _UNDEFINED_CODE = 0;
@@ -19,7 +24,7 @@ public enum AppStatus {
 
     private String msg;
 
-    AppStatus(int code, String msg) {
+    Status(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
@@ -40,8 +45,8 @@ public enum AppStatus {
         this.msg = msg;
     }
 
-    public static final AppStatus getByCode(int code) {
-        for (AppStatus e : AppStatus.values()) {
+    public static final Status getByCode(int code) {
+        for (Status e : Status.values()) {
             if (e.getCode() == code) {
                 return e;
             }
@@ -53,4 +58,4 @@ public enum AppStatus {
         return this.code != _UNDEFINED_CODE;
     }
 
-}
+    }

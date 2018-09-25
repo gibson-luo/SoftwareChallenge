@@ -10,6 +10,7 @@
 # A quick example for getting data from LCBO api
 GET     /products                   controllers.ApplicationController.products
 GET     /lucky                      controllers.ApplicationController.lucky
+GET     /now                        controllers.ApplicationController.nowTime
 
 # authorization
 POST    /register                   controllers.AuthorizationController.register

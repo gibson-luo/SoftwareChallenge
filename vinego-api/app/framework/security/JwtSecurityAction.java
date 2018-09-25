@@ -29,7 +29,7 @@ public class JwtSecurityAction extends play.mvc.Action.Simple {
 
         } catch (Throwable t) {
             Logger.warn("access token verification is failed. exception: {}", t);
-            return CompletableFuture.supplyAsync(() -> forbidden());
+            return CompletableFuture.supplyAsync(() -> ok());
         }
         return delegate.call(ctx);
     }
