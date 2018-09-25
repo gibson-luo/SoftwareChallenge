@@ -19,5 +19,6 @@ public interface UserMapper {
 
     User getUserById(Long id);
 
+    boolean login(User user);
 
 }

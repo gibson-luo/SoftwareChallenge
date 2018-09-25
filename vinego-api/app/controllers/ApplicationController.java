@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import framework.cache.RedisTool;
-import framework.entries.Json;
 import framework.entries.Resp;
 import framework.security.JwtSecurityAction;
 import org.redisson.api.RMap;
@@ -77,19 +76,20 @@ public class ApplicationController extends Controller implements WSBodyReadables
          */
         String key = RedisTool.convertUrl2Key(request);
         RMap<String, String> rMap = redissonClient.getMap(lcboRk);
-        return redissonClient.getMap(lcboRk).containsKeyAsync(key).thenCompose(exists -> {
-            if (exists) {
-                return rMap.getAsync(key).thenApply(value -> ok(Json.toJsonNode(value)));
-            } else {
-                return request.get()
-                    .thenApply(response -> {
-                            JsonNode json = response.asJson();
-                            rMap.putAsync(key, json.toString());
-                            return ok(json);
-                        }
-                    );
-            }
-        });
+        return redissonClient.getMap(lcboRk).containsKeyAsync(key)
+            .thenCompose(exists -> {
+                if (exists) {
+                    return rMap.getAsync(key).thenApply(Resp::ok);
+                } else {
+                    return request.get()
+                        .thenApply(response -> {
+                                JsonNode json = response.asJson();
+                                rMap.putAsync(key, json.toString());
+                                return ok(json);
+                            }
+                        );
+                }
+            });
     }
 
     @With(JwtSecurityAction.class)

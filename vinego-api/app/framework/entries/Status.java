@@ -14,6 +14,8 @@ public enum Status {
 
     USERNAME_REQUIRED(1001,"username required"),
     PASSWORD_REQUIRED(1002,"password required"),
+    USERNAME_EXIST(1003, "username exist"),
+    CANNOT_LOGIN(1004, "username or password is incorrect"),
 
         ;
 

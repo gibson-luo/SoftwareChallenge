@@ -2,6 +2,7 @@ package framework.entries;
 
 import java.util.concurrent.CompletableFuture;
 
+import play.Logger;
 import play.mvc.Result;
 import play.mvc.Results;
 
@@ -24,5 +25,10 @@ public class Resp {
 
     public static CompletableFuture<Result> future(Status status) {
         return CompletableFuture.completedFuture(Resp.status(status));
+    }
+
+    public static Result recover(Throwable throwable) {
+        Logger.error(throwable.getMessage());
+        return Resp.status(Status.INTERNAL_SERVER_ERROR);
     }
 }
