@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import io.jsonwebtoken.lang.Assert;
 import play.mvc.Http;
+import play.mvc.Http.MultipartFormData;
 
 /**
  * Created by gibson.luo on 2018-09-15.
@@ -32,10 +33,20 @@ public class RequestTool {
         Assert.notNull(request, "request cannot be null");
 
         Map<String, String[]> urlParams = request.queryString();
-        Map<String, String[]> bodyParams = Optional.of(request.body().asFormUrlEncoded()).or(Maps.newHashMap());
+        Map<String, String[]> bodyParams = Optional.fromNullable(request.body().asFormUrlEncoded())
+            .or(Maps.newHashMap());
+
+        //multipart
+        Map<String, String[]> multiFormDataBodyParams = Maps.newHashMap();
+        MultipartFormData multipartFormData = request.body().asMultipartFormData();
+        if (multipartFormData != null) {
+            multiFormDataBodyParams = Optional.fromNullable(multipartFormData.asFormUrlEncoded())
+                .or(multiFormDataBodyParams);
+        }
+
         Map<String, String> map = Maps.newHashMap();
 
-        Map<String, String[]> mergeMap = Stream.of(urlParams, bodyParams)
+        Map<String, String[]> mergeMap = Stream.of(urlParams, bodyParams, multiFormDataBodyParams)
             .map(Map::entrySet)
             .flatMap(Collection::stream)
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

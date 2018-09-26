@@ -19,6 +19,10 @@ public class Resp {
         return ok(null);
     }
 
+    public static CompletableFuture<Result> futureOk() {
+        return CompletableFuture.completedFuture(Resp.ok());
+    }
+
     public static Result status(Status status) {
         return Results.ok(Json.toJsonNode(DW.dw(status)));
     }

@@ -12,59 +12,60 @@
     <title>Vine Go</title>
 </head>
 <body>
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal">Vine Go</h5>
-    <a class="btn btn-outline-primary" href="#">Sign up</a>
-</div>
-<div id="app" class="container">
-    <br/>
-    <div class="row">
-        <div class="col-lg-2"></div>
-        <div class="col-lg-8">
-            <div class="col input-group mb-3  input-group-lg">
-                <input id="query" type="text" class="form-control" placeholder="Vine's name or keyword"
-                       aria-label="Vine's name or keyword" aria-describedby="inputGroup-sizing-lg"
-                       aria-describedby="button-go" v-model="query" @keyup.enter="search">
-                <div class="input-group-append">
-                    <button class="btn btn btn-success" type="button" id="button-go" @click="search">Go</button>
-                    <button type="button" class="btn btn-warning">Lucky!</button>
+<div id="app">
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Vine Go</h5>
+        <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#signInModal" v-show="!loggedIn">SIGN IN</a>
+        <h5 class="" v-show="loggedIn">{{jwt.issuer}}</h5>
+    </div>
+    <div class="container">
+        <br/>
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <div class="col input-group mb-3  input-group-lg">
+                    <input id="query" type="text" class="form-control" placeholder="Vine's name or keyword"
+                           aria-label="Vine's name or keyword" aria-describedby="inputGroup-sizing-lg"
+                           aria-describedby="button-go" v-model="query" @keyup.enter="search">
+                    <div class="input-group-append">
+                        <button class="btn btn btn-success" type="button" id="button-go" @click="search">Go</button>
+                        <button type="button" class="btn btn-warning">Lucky!</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div v-for="(item, index) in items" class="row mb-3">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-            <div class="card flex-md-row mb-4 shadow-sm h-md-250">
-                <div class="card-body d-flex flex-column align-items-start">
-                    <strong class="d-inline-block mb-2 text-primary">{{item.primary_category}}</strong>
-                    <h3 class="mb-0">
-                        <a class="text-dark">{{item.name}}</a>
-                    </h3>
-                    <div class="mb-1 text-muted">{{item.package}}</div>
-                    <p class="card-text mb-auto">{{item.serving_suggestion}}</p>
+        <div v-for="(item, index) in items" class="row mb-3">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <div class="card flex-md-row mb-4 shadow-sm h-md-250">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <strong class="d-inline-block mb-2 text-primary">{{item.primary_category}}</strong>
+                        <h3 class="mb-0">
+                            <a class="text-dark">{{item.name}}</a>
+                        </h3>
+                        <div class="mb-1 text-muted">{{item.package}}</div>
+                        <p class="card-text mb-auto">{{item.serving_suggestion}}</p>
+                    </div>
+                    <img class="card-img-right flex-auto d-none d-lg-block"
+                         data-src="holder.js/200x250?theme=thumb"
+                         alt="Thumbnail [200x250]"
+                         v-bind:src="item.image_thumb_url"
+                         data-holder-rendered="true" style="width: 200px; height: 250px;">
                 </div>
-                <img class="card-img-right flex-auto d-none d-lg-block"
-                     data-src="holder.js/200x250?theme=thumb"
-                     alt="Thumbnail [200x250]"
-                     v-bind:src="item.image_thumb_url"
-                     data-holder-rendered="true" style="width: 200px; height: 250px;">
             </div>
+            <div class="col-md-3"></div>
         </div>
-        <div class="col-md-3"></div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-5"></div>
-        <div class="col-lg-2 text-center">
-            <a class="navbar-brand row mb-3" href="#" v-show="isShow">Back To Top</a>
+        <div class="row">
+            <div class="col-lg-5"></div>
+            <div class="col-lg-2 text-center">
+                <a class="navbar-brand row mb-3" href="#" v-show="isShow">Back To Top</a>
+            </div>
+            <div class="col-lg-5"></div>
         </div>
-        <div class="col-lg-5"></div>
     </div>
-
 </div>
-
 
 <script type="text/x-template" id="backtotop">
     <button class="goTop" v-if="isVisible" @click="backToTop">
@@ -72,10 +73,107 @@
     </button>
 </script>
 
+<!-- Sign Up Modal -->
+<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signUpModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12 text-center"><h3>Sign up</h3></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 text-center">to continue to VineGo</div>
+                </div>
+                <br/>
+                <form>
+                    <div class="form-group">
+                        <label for="usernameSignUp">User name</label>
+                        <input type="text" class="form-control" id="usernameSignUp" placeholder="Enter user name">
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordSignUp">Password</label>
+                        <input type="password" class="form-control" id="passwordSignUp" placeholder="Password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Summit</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign In Modal -->
+<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signInModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12 text-center"><h3>Sign in</h3></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 text-center">to continue to VineGo</div>
+                </div>
+                <br/>
+                <form>
+                    <div class="form-group">
+                        <label for="usernameSignIn">User name</label>
+                        <input type="text" class="form-control" id="usernameSignIn" v-model="username"
+                               placeholder="Enter user name" @blur="checkUsername">
+                        <small id="usernameHelp" class="form-text text-danger" v-show="isShowUsernameHelper">
+                            Please enter user name.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordSignIn">Password</label>
+                        <input type="password" class="form-control" id="passwordSignIn" v-model="password"
+                               placeholder="Password" @blur="checkPassword">
+                        <small id="passwordHelp" class="form-text text-danger" v-show="isShowPasswordHelper">
+                            Please enter password.
+                        </small>
+                        <small id="forget" class="form-text text-muted">
+                            <button type="button" class="btn btn-link">Forget password</button>
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link">Sign up</button>
+                <button type="button" class="btn btn-primary" @click="signIn">Summit</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
 </body>
 <!-- Optional JavaScript -->
 <script src="assets/javascripts/vue/2.5.17/vue.js"></script>
 <script src="assets/javascripts/axios/0.18.0/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
 <script src="assets/javascripts/main.js"></script>
 
 </html>

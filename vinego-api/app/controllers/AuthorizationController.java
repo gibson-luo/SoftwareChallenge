@@ -108,14 +108,23 @@ public class AuthorizationController extends Controller {
     }
 
     public CompletionStage<Result> logout() {
-        String issuer = request().getQueryString("issuer");
+        String username = request().getQueryString("username");
+        if (StringUtils.isBlank(username)) { return Resp.future(Status.USERNAME_REQUIRED); }
         RMap<String, String> rMap = redissonClient.getMap(jwtRk);
 
-        return rMap.containsKeyAsync(issuer).thenCompose(hasKey -> {
-            if (hasKey) {
-                return rMap.removeAsync(issuer);
-            }
-            return CompletableFuture.completedFuture(issuer);
-        }).thenApply(Resp::ok);
+        return rMap.containsKeyAsync(username)
+            .thenCompose(hasKey -> {
+                if (hasKey) {
+                    return rMap.removeAsync(username);
+                } else {
+                    return CompletableFuture.completedFuture(username);
+                }
+            })
+            .thenApply(Resp::ok);
+    }
+
+    public CompletionStage<Result> resetPassword() {
+        //TODO to implement
+        return Resp.futureOk();
     }
 }
