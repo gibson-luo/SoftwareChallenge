@@ -10,8 +10,10 @@ import com.google.inject.name.Named;
 import framework.cache.RedisTool;
 import framework.entries.Resp;
 import framework.security.JwtSecurityAction;
+import model.ListObject;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import play.libs.Json;
 import play.libs.ws.WSBodyReadables;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
@@ -79,15 +81,17 @@ public class ApplicationController extends Controller implements WSBodyReadables
         return redissonClient.getMap(lcboRk).containsKeyAsync(key)
             .thenCompose(exists -> {
                 if (exists) {
-                    return rMap.getAsync(key).thenApply(Resp::ok);
+                    return rMap.getAsync(key).thenApply(value -> ok(Json.parse(value)));
                 } else {
-                    return request.get()
-                        .thenApply(response -> {
-                                JsonNode json = response.asJson();
-                                rMap.putAsync(key, json.toString());
-                                return ok(json);
-                            }
-                        );
+                    return request.get().thenApply(response -> {
+                            JsonNode json = response.asJson();
+
+                            ListObject dataObj = play.libs.Json.fromJson(json, ListObject.class);
+                            JsonNode dataJson = Json.toJson(dataObj);
+                            rMap.putAsync(key, Json.stringify(dataJson));
+                            return ok(dataJson);
+                        }
+                    );
                 }
             });
     }

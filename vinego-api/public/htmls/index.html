@@ -16,7 +16,7 @@
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal">Vine Go</h5>
         <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#signInModal" v-show="!loggedIn">SIGN IN</a>
-        <h5 class="" v-show="loggedIn">{{jwt.issuer}}</h5>
+        <button type="button" class="btn btn-outline-primary" v-show="loggedIn">{{jwt.issuer}}</button>
     </div>
     <div class="container">
         <br/>
