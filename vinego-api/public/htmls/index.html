@@ -118,6 +118,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-link" @click="toSignIn">Sign in</button>
                 <button type="button" class="btn btn-primary" @click="signUp">Summit</button>
             </div>
         </div>
@@ -160,9 +161,9 @@
                         <small class="form-text text-danger" v-show="isShowPasswordHelper">
                             Please enter password.
                         </small>
-                        <small class="form-text text-muted">
-                            <button type="button" class="btn btn-link">Forget password</button>
-                        </small>
+                        <!--<small class="form-text text-muted">-->
+                            <!--<button type="button" class="btn btn-link">Forget password</button>-->
+                        <!--</small>-->
 
                     </div>
                 </form>

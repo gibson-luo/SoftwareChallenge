@@ -251,8 +251,12 @@ var signUp = new Vue({
             }).catch(function (error) {
                 console.log(error);
             });
-        }
+        },
 
+        toSignIn: function () {
+            $('#signUpModal').modal('hide');
+            $('#signInModal').modal('show');
+        }
     }
 
 })
