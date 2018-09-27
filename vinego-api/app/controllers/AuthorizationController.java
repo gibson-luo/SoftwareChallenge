@@ -68,7 +68,13 @@ public class AuthorizationController extends Controller {
 
                     return CompletableFuture
                         .supplyAsync(() -> userService.add(user))
-                        .thenApply(Resp::ok);
+                        .thenCompose(isSuccess -> {
+                            if (isSuccess) {
+                                return genJwt(username);
+                            } else {
+                                return Resp.future(Status.USERNAME_EXIST);
+                            }
+                        });
                 } else {
                     return Resp.future(Status.USERNAME_EXIST);
                 }
@@ -96,15 +102,19 @@ public class AuthorizationController extends Controller {
             .supplyAsync(() -> userService.login(user))
             .thenCompose(isSuccess -> {
                 if (isSuccess) {
-                    JwtEntry entry = JwtTool.create(username);
-                    return redissonClient.getMap(jwtRk)
-                        .putAsync(username, Json.toJsonString(entry))
-                        .thenApply(item -> Resp.ok(entry));
+                    return genJwt(username);
                 } else {
                     return Resp.future(Status.CANNOT_LOGIN);
                 }
             })
             .exceptionally(Resp::recover);
+    }
+
+    private CompletionStage<Result> genJwt(String username) {
+        JwtEntry entry = JwtTool.create(username);
+        return redissonClient.getMap(jwtRk)
+            .putAsync(username, Json.toJsonString(entry))
+            .thenApply(item -> Resp.ok(entry));
     }
 
     public CompletionStage<Result> logout() {

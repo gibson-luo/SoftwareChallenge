@@ -33,6 +33,10 @@ Vue.component('backtotop', {
     }
 });
 
+
+/**
+ * the main component
+ */
 var app = new Vue({
     el: '#app',
     data() {
@@ -121,7 +125,9 @@ var app = new Vue({
     }
 })
 
-
+/**
+ * the signIn modal component
+ */
 var signIn = new Vue({
     el: '#signInModal',
     data() {
@@ -158,14 +164,14 @@ var signIn = new Vue({
             bodyFormData.set('username', signIn.username);
             bodyFormData.set('password', signIn.password);
 
-            app.$http.post('/login', bodyFormData, {
+            signIn.$http.post('/login', bodyFormData, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             }).then(function (response) {
                 var json = response.data;
 
-                if (json.code) {
+                if (json.code === 200) {
                     $('#signInModal').modal('hide')
                     app.jwt = json.data
                     app.loggedIn = true
@@ -174,6 +180,8 @@ var signIn = new Vue({
                 } else {
                     signIn.errorMsg = json.msg;
                 }
+            }).catch(function (error) {
+                console.log(error);
             });
         },
 
@@ -183,6 +191,70 @@ var signIn = new Vue({
         }
 
     }
+})
+
+/**
+ * the signUp modal component
+ */
+var signUp = new Vue({
+    el: '#signUpModal',
+    data() {
+        return {
+            username: "",
+            password: "",
+            isShowUsernameHelper: false,
+            isShowPasswordHelper: false,
+            errorMsg: ""
+        }
+    },
+
+    methods: {
+        checkUsername: function () {
+            signUp.isShowUsernameHelper = (signUp.username === "");
+        },
+
+        checkPassword: function () {
+            signUp.isShowPasswordHelper = (signUp.password === "");
+        },
+
+        signUp: function () {
+
+            if (signUp.username === "") {
+                signUp.isShowUsernameHelper = true;
+                return;
+            }
+            if (signUp.password === "") {
+                signUp.isShowPasswordHelper = true;
+                return;
+            }
+
+            var bodyFormData = new FormData();
+            bodyFormData.set('username', signUp.username);
+            bodyFormData.set('password', signUp.password);
+
+            signUp.$http.post('/register', bodyFormData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function (response) {
+                var json = response.data;
+
+                if (json.code === 200) {
+                    $('#signUpModal').modal('hide')
+                    app.jwt = json.data
+                    app.loggedIn = true
+                    Object.assign(signUp.$data, signUp.$options.data())
+                    console.log("sign up success");
+                } else {
+                    signIn.errorMsg = json.msg;
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+        }
+
+    }
+
 })
 
 window.onscroll = () => {
