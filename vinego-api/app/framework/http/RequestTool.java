@@ -18,9 +18,10 @@ import play.mvc.Http.MultipartFormData;
 public class RequestTool {
 
     /**
-     * Get all params from the specified request. The params combine 2 parts including
+     * Get all params from the specified request. The params combine 3 parts including
      * 1. url params (e.g. product_name=beer&product_id=12332)
      * 2. form params - the post request with form
+     * 3. multipart body params
      *
      * the empty param names or values are removed out
      * if the params have reduplicated name, it just keep the first one

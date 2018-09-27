@@ -35,20 +35,22 @@ Vue.component('backtotop', {
 
 var app = new Vue({
     el: '#app',
-    data: {
-        jwt: {
-            issuedAt: 0,
-            issuer: "",
-            token: ""
-        },
-        loggedIn: false,
-        query: "",
-        items: [],
-        pager: {
-            is_final_page: false,
-            next_page: undefined
-        },
-        isShow: false
+    data() {
+        return {
+            jwt: {
+                issuedAt: 0,
+                issuer: "",
+                token: ""
+            },
+            loggedIn: false,
+            query: "",
+            items: [],
+            pager: {
+                is_final_page: false,
+                next_page: undefined
+            },
+            isShow: false
+        }
     },
     methods: {
 
@@ -60,7 +62,13 @@ var app = new Vue({
         },
 
         loadItems: function () {
-            if (typeof app.pager.is_final_page == 'undefined' || app.pager.is_final_page){
+
+            if (!app.loggedIn) {
+                app.$refs.signInBtn.click();
+                return;
+            }
+
+            if (typeof app.pager.is_final_page == 'undefined' || app.pager.is_final_page) {
                 return;
             }
 
@@ -74,16 +82,31 @@ var app = new Vue({
                 }
             }).then(function (response) {
                 var json = response.data;
-                console.log(json)
-
-
-
                 if (app.items.length == 0) {
                     app.items = json.result;
                 } else {
                     app.items = app.items.concat(json.result);
                 }
                 app.pager = json.pager;
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+
+        signOut: function () {
+            app.$http.get('/logout', {
+                params: {
+                    username: app.jwt.issuer
+                },
+                headers: {
+                    'Authorization': 'Bearer '.concat(app.jwt.token)
+                }
+            }).then(function (response) {
+                var json = response.data;
+                if (json.code == 200) {
+                    console.log("sign out success");
+                    Object.assign(app.$data, app.$options.data())
+                }
             }).catch(function (error) {
                 console.log(error);
             });
@@ -101,11 +124,14 @@ var app = new Vue({
 
 var signIn = new Vue({
     el: '#signInModal',
-    data: {
-        username: "",
-        password: "",
-        isShowUsernameHelper: false,
-        isShowPasswordHelper: false
+    data() {
+        return {
+            username: "",
+            password: "",
+            isShowUsernameHelper: false,
+            isShowPasswordHelper: false,
+            errorMsg: ""
+        }
     },
     methods: {
 
@@ -138,12 +164,22 @@ var signIn = new Vue({
                 }
             }).then(function (response) {
                 var json = response.data;
-                if(json.code === 200){
+
+                if (json.code) {
                     $('#signInModal').modal('hide')
                     app.jwt = json.data
                     app.loggedIn = true
+                    Object.assign(signIn.$data, signIn.$options.data())
+                    console.log("sign in success");
+                } else {
+                    signIn.errorMsg = json.msg;
                 }
-            })
+            });
+        },
+
+        toSignUp: function () {
+            $('#signInModal').modal('hide');
+            $('#signUpModal').modal('show');
         }
 
     }
